@@ -1,0 +1,58 @@
+name: Verify generated site
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ruby/setup-ruby@v1.328.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+      - name: Build
+        run: bundle exec jekyll build --baseurl "/LJT-Homepage"
+        env:
+          JEKYLL_ENV: production
+      - name: Verify generated pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f _site/index.html
+          test -f _site/publications/index.html
+          test -f _site/publications/synlogic/index.html
+          for text in \
+            "Junteng Liu" \
+            "First-year PhD candidate" \
+            "Personal Details" \
+            "Education" \
+            "Research Experience" \
+            "Skills" \
+            "Contact Information" \
+            "jliugi@connect.ust.hk" \
+            "Vicent0205" \
+            "junteng88716710" \
+            "SynLogic" \
+            "On the Perception Bottleneck of VLMs for Chart Understanding" \
+            "On the Universal Truthfulness Hyperplane Inside LLMs" \
+            "In-Context Sharpness as Alerts" \
+            "C-Eval" \
+            "Composing Parameter-Efficient Modules with Arithmetic Operations"
+          do
+            grep -Fq "$text" _site/index.html
+            grep -Fq "$text" _site/publications/index.html || [ "$text" = "Education" ] || [ "$text" = "Research Experience" ] || [ "$text" = "Skills" ] || [ "$text" = "Contact Information" ] || [ "$text" = "Personal Details" ] || [ "$text" = "jliugi@connect.ust.hk" ] || [ "$text" = "Vicent0205" ] || [ "$text" = "junteng88716710" ]
+          done
+          if grep -Fiq "Paper Title Number" _site/publications/index.html; then
+            echo "Template publication remains" >&2
+            exit 1
+          fi
+          if grep -Fiq "Academic Pages is a ready-to-fork" _site/index.html; then
+            echo "Template about content remains" >&2
+            exit 1
+          fi
