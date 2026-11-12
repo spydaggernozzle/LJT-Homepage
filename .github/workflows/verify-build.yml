@@ -1,0 +1,39 @@
+name: Verify output scope
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ruby/setup-ruby@v1.328.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+      - name: Build
+        run: bundle exec jekyll build --baseurl "/LJT-Homepage"
+        env:
+          JEKYLL_ENV: production
+      - name: Verify output scope and content
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f _site/index.html
+          test -f _site/publications/index.html
+          test ! -e _site/publications/synlogic/index.html
+          test ! -e _site/talkmap/map.html
+          test ! -e _site/talkmap.py
+          test ! -e _site/files/paper1.pdf
+          test ! -e _site/markdown_generator/README.html
+          for text in "Personal Details" "Education" "Research Experience" "Skills" "Contact Information" "SynLogic" "C-Eval"; do
+            grep -Fq "$text" _site/index.html
+          done
+          for text in "SynLogic" "First author" "Vision4Chart" "Universal_Truthfulness_Hyperplane" "In-Context Sharpness as Alerts" "C-Eval" "Composing Parameter-Efficient Modules"; do
+            grep -Fq "$text" _site/publications/index.html
+          done
