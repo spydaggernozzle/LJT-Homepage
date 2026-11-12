@@ -76,6 +76,7 @@ keep_files:
   - .git
   - .svn
 
+
 encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
@@ -98,10 +99,10 @@ kramdown:
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
 
-# The publications collection remains available to the template.
+# Publication records supply the single publications index; individual detail pages are disabled.
 collections:
   publications:
-    output: true
+    output: false
     permalink: /:collection/:path/
 
 # Defaults
