@@ -42,7 +42,6 @@ atom_feed:
 include:
   - .htaccess
   - _pages
-  - files
 
 exclude:
   - "*.sublime-project"
@@ -52,6 +51,7 @@ exclude:
   - .github
   - .jekyll-assets-cache
   - .sass-cache
+  - _drafts/
   - assets/js/_main.js
   - assets/js/plugins
   - assets/js/vendor
@@ -59,16 +59,22 @@ exclude:
   - Capfile
   - config
   - Dockerfile
+  - files/
   - Gemfile
   - Gruntfile.js
   - gulpfile.js
   - LICENSE
   - local
   - log
+  - markdown_generator/
   - node_modules
   - package.json*
   - Rakefile
   - README
+  - talkmap/
+  - talkmap.ipynb
+  - talkmap.py
+  - talkmap_out.ipynb
   - tmp
   - vendor
 
