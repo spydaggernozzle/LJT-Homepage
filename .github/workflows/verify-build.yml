@@ -1,0 +1,42 @@
+name: Verify production build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - uses: ruby/setup-ruby@v1.328.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+      - name: Install UglifyJS
+        run: npm install -g uglify-js
+      - name: Minify JS files
+        run: uglifyjs assets/js/plugins/jquery.greedy-navigation.js assets/js/_main.js assets/js/theme.js -c -m -o assets/js/main.min.js
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "/LJT-Homepage"
+        env:
+          JEKYLL_ENV: production
+      - name: Verify generated site
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f _site/index.html
+          test -f _site/publications/index.html
+          test ! -e _site/publications/synlogic/index.html
+          for text in "Personal Details" "Education" "Research Experience" "Skills" "Contact Information" "SynLogic" "C-Eval"; do
+            grep -Fq "$text" _site/index.html
+          done
+          for text in "SynLogic" "First author" "Vision4Chart" "Universal_Truthfulness_Hyperplane" "In-Context Sharpness as Alerts" "C-Eval" "Composing Parameter-Efficient Modules"; do
+            grep -Fq "$text" _site/publications/index.html
+          done
